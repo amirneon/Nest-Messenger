@@ -35,13 +35,13 @@ export class messageController {
   }
 
   @Post("register")
-  registerInSocket(
+  async registerInSocket(
     @Res() res: Response,
     @Req() req: Request,
     @Body() createUserDto: CreateUserDto
   ) {
     try {
-      this.usersService.create(createUserDto);
+      await this.usersService.create(createUserDto);
 
       // Send success message and redirect to chat page
       res.send(`
@@ -85,13 +85,13 @@ export class messageController {
           secure: process.env.NODE_ENV === "production",
         })
         .status(200)
-        .redirect("chat");
+        .redirect("home");
     } catch (error) {
       console.log(error);
     }
   }
 
-  @Get("chat")
+  @Get("chat/public")
   getIndexChat(
     @Res() res: Response,
     @Req() req: Request,

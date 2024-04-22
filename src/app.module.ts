@@ -13,7 +13,7 @@ import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
 // import { Message, messageSchema } from "./messages/entities/message.entity";
 // import { Connection } from "mongoose";
-import { ChatRoomsModule } from './chat-rooms/chat-rooms.module';
+import { ChatRoomsModule } from "./chat-rooms/chat-rooms.module";
 // import * as AutoIncrementFactory from "mongoose-sequence";
 
 @Module({
@@ -54,7 +54,10 @@ import { ChatRoomsModule } from './chat-rooms/chat-rooms.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(SocketAuthGuardMiddleware).forRoutes("api/v1/chat");
+    consumer
+      .apply(SocketAuthGuardMiddleware)
+      .exclude("api/v1/login", "api/v1/register")
+      .forRoutes("*");
   }
 }
 // export class AppModule {}

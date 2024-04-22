@@ -1,6 +1,4 @@
 import { Injectable } from "@nestjs/common";
-import { CreateChatRoomDto } from "./dto/create-chat-room.dto";
-import { UpdateChatRoomDto } from "./dto/update-chat-room.dto";
 import { InjectModel } from "@nestjs/mongoose";
 import { ChatRooms } from "./schema/chat-room.schema";
 import { Model } from "mongoose";
@@ -17,36 +15,46 @@ export class ChatRoomsService {
     return chatRoom;
   }
 
-  // create(createChatRoomDto: CreateChatRoomDto) {
-  //   return "This action adds a new chatRoom";
-  // }
+  async getChatRooms(userId: string): Promise<ChatRooms[]> {
+    return await this.chatRoomModel.find({ user: userId }).populate("user");
+  }
 
-  // findAll() {
-  //   return `This action returns all chatRooms`;
-  // }
+  async createChatRoom(roomId: string, usernames: string[]) {
+    // console.log("***************************");
+    // console.log(roomId);
+    // console.log(usernames);
 
-  // findOne(id: number) {
-  //   return `This action returns a #${id} chatRoom`;
-  // }
+    if (usernames.length == 2) {
+      const checkIfExist = await this.chatRoomModel.findOne({
+        user: usernames,
+      });
+      // console.log("***********************************", checkIfExist);
 
-  // update(id: number, updateChatRoomDto: UpdateChatRoomDto) {
-  //   return `This action updates a #${id} chatRoom`;
-  // }
+      const usernames1 = [];
+      usernames1.push(usernames[1]);
+      usernames1.push(usernames[0]);
+      const checkIfExist1 = await this.chatRoomModel.findOne({
+        user: usernames1,
+      });
+      // console.log("***********************************", checkIfExist1);
 
-  // remove(id: number) {
-  //   return `This action removes a #${id} chatRoom`;
-  // }
+      if (checkIfExist) {
+        // console.log("***********************************", checkIfExist);
 
-  async createChatRoom(
-    roomId: string,
-    usernames: string[] | string
-  ): Promise<string> {
-    const checkIfExist = await this.chatRoomModel.findOne({ user: usernames });
-    if (checkIfExist) {
-      return checkIfExist.chatRoomId;
-    } else {
-      await this.chatRoomModel.create({ user: usernames, chatRoomId: roomId });
-      return roomId;
+        return checkIfExist.chatRoomId;
+      } else if (checkIfExist1) {
+        // console.log("***********************************", checkIfExist1);
+
+        return checkIfExist1.chatRoomId;
+      }
     }
+    //TODO: handle if usernames.length === 1
+    await this.chatRoomModel.create({
+      user: usernames,
+      chatRoomId: roomId,
+    });
+    // console.log("&&&&&&&&&&&&&&&", usernames);
+
+    return roomId;
   }
 }
